@@ -537,8 +537,8 @@ function updateValues(key, value)
     g_app.setMaxFps(v)
   elseif key == "enableLights" then
     gameMapPanel:setDrawLights(value and options["ambientLight"] < 100)
-    graphicsPanel:getChildById("ambientLight"):setEnabled(value)
-    graphicsPanel:getChildById("ambientLightLabel"):setEnabled(value)
+    graphicsPanel:getChildById("ambientLight"):setVisible(value)
+    graphicsPanel:getChildById("ambientLightLabel"):setVisible(value)
   elseif key == "floorFading" then
     gameMapPanel:setFloorFading(value)
     gameWindowPanel:getChildById("floorFadingLabel"):setText(tr("Floor fading: %s ms", value))
