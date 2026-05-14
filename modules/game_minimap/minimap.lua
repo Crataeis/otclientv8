@@ -20,26 +20,20 @@ local function updateLayoutInternal()
   local mode = modules.client_options.getOption('wideMinimap')
   local targetParent = rightPanel
   local targetWidth = defaultMinimapWidth or 0
+  local targetPos = nil
 
-  if mode == 2 then
-    local leftPanel1 = modules.game_interface.getLeftPanelByIndex(1)
-    if leftPanel1 then
-      targetParent = leftPanel1
-      if modules.game_interface.getLeftPanelsCount() >= 2 then
-        local leftPanel2 = modules.game_interface.getLeftPanelByIndex(2)
-        targetParent = leftPanel2
-        local leftEdge = leftPanel2:getX() + leftPanel2:getPaddingLeft()
-        local rightEdge = leftPanel1:getX() + leftPanel1:getWidth() - leftPanel1:getPaddingRight()
-        targetWidth = math.max(defaultMinimapWidth or 0, rightEdge - leftEdge)
-      end
-    end
-  elseif mode == 3 then
-    if modules.game_interface.getRightPanelsCount() >= 2 then
-      targetParent = modules.game_interface.getRightPanel(2)
-      local leftEdge = targetParent:getX() + targetParent:getPaddingLeft()
-      local rightEdge = rightPanel:getX() + rightPanel:getWidth() - rightPanel:getPaddingRight()
-      targetWidth = math.max(defaultMinimapWidth or 0, rightEdge - leftEdge)
-    end
+  if mode == 2 and modules.game_interface.getLeftPanelsCount() >= 2 then
+    local container = modules.game_interface.getLeftPanelsContainer()
+    targetParent = modules.game_interface.getRootPanel()
+    targetWidth = container:getWidth()
+    targetPos = {x = container:getX(), y = container:getY()}
+  elseif mode == 2 and modules.game_interface.getLeftPanelsCount() == 1 then
+    targetParent = modules.game_interface.getLeftPanelByIndex(1)
+  elseif mode == 3 and modules.game_interface.getRightPanelsCount() >= 2 then
+    local container = modules.game_interface.getRightPanelsContainer()
+    targetParent = modules.game_interface.getRootPanel()
+    targetWidth = container:getWidth()
+    targetPos = {x = container:getX(), y = container:getY()}
   end
 
   if minimapWindow:getParent() ~= targetParent then
@@ -47,6 +41,10 @@ local function updateLayoutInternal()
   end
 
   minimapWindow:setWidth(targetWidth)
+
+  if targetPos then
+    minimapWindow:setPosition(targetPos)
+  end
 end
 
 function init()
