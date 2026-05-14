@@ -5,10 +5,54 @@ fullmapView = false
 loaded = false
 oldZoom = nil
 oldPos = nil
+defaultMinimapWidth = nil
+
+local function updateLayoutInternal()
+  if not minimapWindow then
+    return
+  end
+
+  local rightPanel = modules.game_interface.getRightPanel()
+  if not rightPanel then
+    return
+  end
+
+  local mode = modules.client_options.getOption('wideMinimap')
+  local targetParent = rightPanel
+  local targetWidth = defaultMinimapWidth or 0
+
+  if mode == 2 then
+    local leftPanel1 = modules.game_interface.getLeftPanelByIndex(1)
+    if leftPanel1 then
+      targetParent = leftPanel1
+      if modules.game_interface.getLeftPanelsCount() >= 2 then
+        local leftPanel2 = modules.game_interface.getLeftPanelByIndex(2)
+        targetParent = leftPanel2
+        local leftEdge = leftPanel2:getX() + leftPanel2:getPaddingLeft()
+        local rightEdge = leftPanel1:getX() + leftPanel1:getWidth() - leftPanel1:getPaddingRight()
+        targetWidth = math.max(defaultMinimapWidth or 0, rightEdge - leftEdge)
+      end
+    end
+  elseif mode == 3 then
+    if modules.game_interface.getRightPanelsCount() >= 2 then
+      targetParent = modules.game_interface.getRightPanel(2)
+      local leftEdge = targetParent:getX() + targetParent:getPaddingLeft()
+      local rightEdge = rightPanel:getX() + rightPanel:getWidth() - rightPanel:getPaddingRight()
+      targetWidth = math.max(defaultMinimapWidth or 0, rightEdge - leftEdge)
+    end
+  end
+
+  if minimapWindow:getParent() ~= targetParent then
+    minimapWindow:setParent(targetParent)
+  end
+
+  minimapWindow:setWidth(targetWidth)
+end
 
 function init()
   minimapWindow = g_ui.loadUI('minimap', modules.game_interface.getRightPanel())
   minimapWindow:setContentMinimumHeight(64)
+  defaultMinimapWidth = minimapWindow:getWidth()
 
   if not minimapWindow.forceOpen then
     minimapButton = modules.client_topmenu.addRightGameToggleButton('minimapButton', 
@@ -115,6 +159,8 @@ function init()
   if g_game.isOnline() then
     online()
   end
+
+  refreshLayout()
 end
 
 function terminate()
@@ -148,6 +194,10 @@ function terminate()
   if minimapButton then
     minimapButton:destroy()
   end
+  minimapWidget = nil
+  minimapButton = nil
+  minimapWindow = nil
+  defaultMinimapWidth = nil
 end
 
 function toggle()
@@ -170,6 +220,7 @@ end
 function online()
   loadMap()
   updateCameraPosition()
+  refreshLayout()
 end
 
 function offline()
@@ -233,6 +284,7 @@ function toggleFullMap()
     minimapWidget:fill('parent')
     minimapWindow:show()
     minimapWidget:setAlternativeWidgetsVisible(false)
+    refreshLayout()
   end
 
   local zoom = oldZoom or 0
@@ -261,4 +313,8 @@ end
 
 function zoomOut()
   minimapWidget:zoomOut()
+end
+
+function refreshLayout()
+  addEvent(updateLayoutInternal)
 end
