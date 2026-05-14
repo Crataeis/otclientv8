@@ -96,7 +96,6 @@ local gameWindowPanel, gameWindowButton
 local graphicsPanel
 
 local miscPanel, miscButton
-local debugPanel, debugButton
 
 function init()
   for k, v in pairs(defaultOptions) do
@@ -248,20 +247,6 @@ function init()
   miscButton = optionsTabBar:addTab(tr("Misc"), miscPanel, "/images/options/icon-misc")
   miscButton:setMarginTop(10)
 
-  if not g_game.getFeature(GameNoDebug) and not g_app.isMobile() then
-    debugPanel = g_ui.loadUI("debug")
-    debugButton = optionsTabBar:addTab(tr("Debug"), debugPanel)
-
-    addSubTab(miscButton, debugButton, true)
-
-    for _, v in ipairs(g_extras.getAll()) do
-      local extrasButton = g_ui.createWidget("OptionCheckBox")
-      extrasButton:setId(v)
-      extrasButton:setText(g_extras.getDescription(v))
-      debugPanel:addChild(extrasButton)
-    end
-  end
-
   optionsButton = modules.client_topmenu.addLeftButton("optionsButton", tr("Options"), "/images/topbuttons/options", toggle)
 
   addEvent(function() setup() end)
@@ -379,14 +364,6 @@ function setup()
       setOption(k, g_settings.getNumber(k), true)
     elseif type(v) == "string" then
       setOption(k, g_settings.getString(k), true)
-    end
-  end
-
-  for _, v in ipairs(g_extras.getAll()) do
-    g_extras.set(v, g_settings.getBoolean("extras_" .. v))
-    local widget = debugPanel:recursiveGetChildById(v)
-    if widget then
-      widget:setChecked(g_extras.get(v))
     end
   end
 
