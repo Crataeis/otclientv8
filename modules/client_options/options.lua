@@ -19,6 +19,7 @@ local defaultOptions = {
   showPrivateMessagesOnScreen = true,
   rightPanels = 1,
   leftPanels = g_app.isMobile() and 1 or 2,
+  wideMinimap = false,
   containerPanel = 8,
   backgroundFrameRate = 60,
   enableAudio = true,
@@ -42,7 +43,6 @@ local defaultOptions = {
   dontStretchShrink = false,
   turnDelay = 30,
   hotkeyDelay = 200,
-  actionbarWidgetDelay = 200,
 
   chatMode = CHAT_MODE.ON,
   walkFirstStepDelay = 200,
@@ -52,18 +52,6 @@ local defaultOptions = {
   walkCtrlTurnDelay = 150,
 
   topBar = true,
-
-  actionbar1 = true,
-  actionbar2 = false,
-  actionbar3 = false,
-  actionbar4 = false,
-  actionbar5 = false,
-  actionbar6 = false,
-  actionbar7 = false,
-  actionbar8 = false,
-  actionbar9 = false,
-
-  actionbarLock = false,
 
   profile = 1,
 
@@ -106,8 +94,6 @@ local consolePanel, consoleButton
 local gameWindowPanel, gameWindowButton
 
 local graphicsPanel
-local soundPanel
-local audioButton
 
 local miscPanel, miscButton
 local debugPanel, debugButton
@@ -258,9 +244,6 @@ function init()
   graphicsPanel = g_ui.loadUI("graphics")
   optionsTabBar:addTab(tr("Graphics"), graphicsPanel, "/images/options/icon-graphics"):setMarginTop(10)
 
-  soundPanel = g_ui.loadUI("audio")
-  optionsTabBar:addTab(tr("Sound"), soundPanel, "/images/options/icon-sound"):setMarginTop(10)
-
   miscPanel = g_ui.loadUI("misc")
   miscButton = optionsTabBar:addTab(tr("Misc"), miscPanel, "/images/options/icon-misc")
   miscButton:setMarginTop(10)
@@ -280,10 +263,6 @@ function init()
   end
 
   optionsButton = modules.client_topmenu.addLeftButton("optionsButton", tr("Options"), "/images/topbuttons/options", toggle)
-  audioButton = modules.client_topmenu.addLeftButton("audioButton", tr("Audio"), "/images/topbuttons/audio", function() toggleOption("enableAudio") end)
-  if g_app.isMobile() then
-    audioButton:hide()
-  end
 
   addEvent(function() setup() end)
 
@@ -311,11 +290,6 @@ function terminate()
   if optionsButton then
     optionsButton:destroy()
     optionsButton = nil
-  end
-
-  if audioButton then
-    audioButton:destroy()
-    audioButton = nil
   end
 
   if presetWindow then
@@ -559,11 +533,6 @@ function updateValues(key, value)
     if g_sounds ~= nil then
       g_sounds.setAudioEnabled(value)
     end
-    if value then
-      audioButton:setIcon("/images/topbuttons/audio")
-    else
-      audioButton:setIcon("/images/topbuttons/audio_mute")
-    end
   elseif key == "enableMusicSound" then
     if g_sounds ~= nil then
       g_sounds.getChannel(SoundChannels.Music):setEnabled(value)
@@ -572,12 +541,10 @@ function updateValues(key, value)
     if g_sounds ~= nil then
       g_sounds.getChannel(SoundChannels.Music):setGain(value / 100)
     end
-    soundPanel:getChildById("musicSoundVolumeLabel"):setText(tr("Music volume: %d", value))
   elseif key == "botSoundVolume" then
     if g_sounds ~= nil then
       g_sounds.getChannel(SoundChannels.Bot):setGain(value / 100)
     end
-    soundPanel:getChildById("botSoundVolumeLabel"):setText(tr("Bot sound volume: %d", value))
   elseif key == "showHealthManaCircle" then
     modules.game_healthinfo.healthCircle:setVisible(value)
     modules.game_healthinfo.healthCircleFront:setVisible(value)
@@ -639,8 +606,6 @@ function updateValues(key, value)
     end
   elseif key == "hotkeyDelay" then
     controlsPanel:getChildById("hotkeyDelayLabel"):setText(tr("Hotkey delay: %s ms", value))
-  elseif key == "actionbarWidgetDelay" then
-    controlsPanel:getChildById("actionbarWidgetDelayLabel"):setText(tr("Actionbar widget delay: %s ms", value))
   elseif key == "walkFirstStepDelay" then
     controlsPanel:getChildById("walkFirstStepDelayLabel"):setText(tr("Walk delay after first step: %s ms", value))
   elseif key == "walkTurnDelay" then
@@ -730,8 +695,10 @@ function setOption(key, value, force)
 
   if key == "classicView" or key == "rightPanels" or key == "leftPanels" or key == "cacheMap" then
     modules.game_interface.refreshViewMode()
-  elseif key:find("actionbar") then
-    modules.game_actionbar.show()
+  elseif key == "wideMinimap" then
+    if modules.game_minimap and modules.game_minimap.refreshLayout then
+      modules.game_minimap.refreshLayout()
+    end
   end
 
   if key == "topBar" then
