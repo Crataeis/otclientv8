@@ -71,6 +71,10 @@ function init()
   bindKeys()
   
   connect(gameMapPanel, { onGeometryChange = updateSize, onVisibleDimensionChange = updateSize })
+  connect(gameLeftPanels, { onGeometryChange = updateSize, onVisibilityChange = updateSize })
+  connect(gameRightPanels, { onGeometryChange = updateSize, onVisibilityChange = updateSize })
+  connect(gameLeftActionPanel, { onGeometryChange = updateSize, onVisibilityChange = updateSize })
+  connect(gameRightActionPanel, { onGeometryChange = updateSize, onVisibilityChange = updateSize })
   connect(g_game, { onMapChangeAwareRange = updateSize })
 
   if g_game.isOnline() then
@@ -140,8 +144,12 @@ function terminate()
     onLoginAdvice = onLoginAdvice
   })
 
-  disconnect(gameMapPanel, { onGeometryChange = updateSize })
-  connect(gameMapPanel, { onGeometryChange = updateSize, onVisibleDimensionChange = updateSize })
+  disconnect(gameMapPanel, { onGeometryChange = updateSize, onVisibleDimensionChange = updateSize })
+  disconnect(gameLeftPanels, { onGeometryChange = updateSize, onVisibilityChange = updateSize })
+  disconnect(gameRightPanels, { onGeometryChange = updateSize, onVisibilityChange = updateSize })
+  disconnect(gameLeftActionPanel, { onGeometryChange = updateSize, onVisibilityChange = updateSize })
+  disconnect(gameRightActionPanel, { onGeometryChange = updateSize, onVisibilityChange = updateSize })
+  disconnect(g_game, { onMapChangeAwareRange = updateSize })
 
   logoutButton:destroy()
   gameRootPanel:destroy()
@@ -849,11 +857,19 @@ function getMapPanel()
   return gameMapPanel
 end
 
-function getRightPanel()
+function getRightPanel(indexFromRight)
   if gameRightPanels:getChildCount() == 0 then
     addRightPanel()
   end
-  return gameRightPanels:getChildByIndex(-1)
+  if not indexFromRight or indexFromRight <= 1 then
+    return gameRightPanels:getChildByIndex(-1)
+  end
+
+  return gameRightPanels:getChildByIndex(math.max(1, gameRightPanels:getChildCount() - indexFromRight + 1))
+end
+
+function getRightPanelsCount()
+  return gameRightPanels:getChildCount()
 end
 
 function getLeftPanel()
@@ -861,6 +877,15 @@ function getLeftPanel()
     return gameLeftPanels:getChildByIndex(-1)
   end
   return getRightPanel()
+end
+
+function getLeftPanelByIndex(n)
+  if gameLeftPanels:getChildCount() == 0 then return nil end
+  return gameLeftPanels:getChildByIndex(math.max(1, gameLeftPanels:getChildCount() - n + 1))
+end
+
+function getLeftPanelsCount()
+  return gameLeftPanels:getChildCount()
 end
 
 function getContainerPanel()
@@ -1033,19 +1058,44 @@ function refreshViewMode()
       modules.game_console.switchMode(true)
     end
   end
---  if modules.game_actionbar then
---    modules.game_actionbar.switchMode(not classic)    
---  end
-  
   if g_settings.getBoolean("cacheMap") then
     g_game.enableFeature(GameBiggerMapCache)
   end
   
   updateSize()
+
+  if modules.game_minimap and modules.game_minimap.refreshLayout then
+    modules.game_minimap.refreshLayout()
+  end
 end
 
 function limitZoom()
   limitedZoom = true
+end
+
+local function getHorizontalInset(widget, rootWidth, fromRight)
+  if not widget or not widget:isVisible() or widget:getWidth() <= 0 then
+    return 0
+  end
+
+  if fromRight then
+    return math.max(0, rootWidth - widget:getX())
+  end
+
+  return math.max(0, widget:getX() + widget:getWidth())
+end
+
+local function getMapSideInsets(rootWidth)
+  local leftInset = math.max(
+    getHorizontalInset(gameLeftPanels, rootWidth, false),
+    getHorizontalInset(gameLeftActionPanel, rootWidth, false)
+  )
+  local rightInset = math.max(
+    getHorizontalInset(gameRightPanels, rootWidth, true),
+    getHorizontalInset(gameRightActionPanel, rootWidth, true)
+  )
+
+  return leftInset, rightInset
 end
 
 function updateSize()
@@ -1066,6 +1116,7 @@ function updateSize()
     local dwidth = dimenstion.width
     local tileSize = rheight / dheight
     local maxWidth = tileSize * (awareRange.width + 1)
+    local leftInset, rightInset = getMapSideInsets(rwidth)
     if g_game.getFeature(GameChangeMapAwareRange) and g_game.getFeature(GameNewWalking) then
       maxWidth = tileSize * (awareRange.width - 1)
     end
@@ -1074,12 +1125,13 @@ function updateSize()
       modules.game_stats.ui:setMarginTop(tileSize)
     end
     if g_settings.getBoolean("cacheMap") then
-      gameMapPanel:setMarginLeft(0)
-      gameMapPanel:setMarginRight(0)    
+      gameMapPanel:setMarginLeft(leftInset)
+      gameMapPanel:setMarginRight(rightInset)
     else
-      local margin = math.max(0, math.floor((rwidth - maxWidth) / 2))
-      gameMapPanel:setMarginLeft(margin)
-      gameMapPanel:setMarginRight(margin)
+      local availableWidth = math.max(0, rwidth - leftInset - rightInset)
+      local margin = math.max(0, math.floor((availableWidth - maxWidth) / 2))
+      gameMapPanel:setMarginLeft(leftInset + margin)
+      gameMapPanel:setMarginRight(rightInset + margin)
     end
       
     if modules.game_bot then
