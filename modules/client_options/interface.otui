@@ -69,8 +69,6 @@ OptionPanel
         self:addOption("0")
         self:addOption("1")
         self:addOption("2")
-        self:addOption("3")
-        self:addOption("4")
 
     ComboBox
       id: rightPanels
@@ -83,8 +81,6 @@ OptionPanel
       @onSetup: |
         self:addOption("1")
         self:addOption("2")
-        self:addOption("3")
-        self:addOption("4")
 
     ComboBox
       id: containerPanel
@@ -96,12 +92,8 @@ OptionPanel
       @onSetup: |
         self:addOption("1st left panel")
         self:addOption("2nd left panel")
-        self:addOption("3rd left panel")
-        self:addOption("4th left panel")
         self:addOption("1st right panel")
         self:addOption("2nd right panel")
-        self:addOption("3rd right panel")
-        self:addOption("4th right panel")
 
   Panel
     height: 40

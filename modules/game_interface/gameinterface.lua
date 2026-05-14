@@ -888,18 +888,11 @@ function getLeftPanelsCount()
   return gameLeftPanels:getChildCount()
 end
 
-function getRightPanelsContainer()
-  return gameRightPanels
-end
-
-function getLeftPanelsContainer()
-  return gameLeftPanels
-end
 
 function getContainerPanel()
   local containerPanel = g_settings.getNumber("containerPanel")
-  if containerPanel >= 5 then
-    containerPanel = containerPanel - 4
+  if containerPanel >= 3 then
+    containerPanel = containerPanel - 2
     return gameRightPanels:getChildByIndex(math.min(containerPanel, gameRightPanels:getChildCount()))
   end
   if gameLeftPanels:getChildCount() == 0 then
@@ -909,7 +902,7 @@ function getContainerPanel()
 end
 
 local function addRightPanel()
-  if gameRightPanels:getChildCount() >= 4 then
+  if gameRightPanels:getChildCount() >= 2 then
     return
   end
   local panel = g_ui.createWidget('GameSidePanel')
@@ -918,7 +911,7 @@ local function addRightPanel()
 end
 
 local function addLeftPanel()
-  if gameLeftPanels:getChildCount() >= 4 then
+  if gameLeftPanels:getChildCount() >= 2 then
     return
   end
   local panel = g_ui.createWidget('GameSidePanel')

@@ -7,6 +7,8 @@ oldZoom = nil
 oldPos = nil
 defaultMinimapWidth = nil
 
+local PANEL_WIDTH = 198
+
 local function updateLayoutInternal()
   if not minimapWindow then
     return
@@ -18,32 +20,47 @@ local function updateLayoutInternal()
   end
 
   local mode = modules.client_options.getOption('wideMinimap')
-  local targetParent = rightPanel
-  local targetWidth = defaultMinimapWidth or 0
-  local targetPos = nil
 
-  if mode == 2 and modules.game_interface.getLeftPanelsCount() >= 2 then
-    local container = modules.game_interface.getLeftPanelsContainer()
-    targetParent = modules.game_interface.getRootPanel()
-    targetWidth = container:getWidth()
-    targetPos = {x = container:getX(), y = container:getY()}
-  elseif mode == 2 and modules.game_interface.getLeftPanelsCount() == 1 then
-    targetParent = modules.game_interface.getLeftPanelByIndex(1)
-  elseif mode == 3 and modules.game_interface.getRightPanelsCount() >= 2 then
-    local container = modules.game_interface.getRightPanelsContainer()
-    targetParent = modules.game_interface.getRootPanel()
-    targetWidth = container:getWidth()
-    targetPos = {x = container:getX(), y = container:getY()}
+  -- Restore all panels to default width and visibility before applying mode
+  for i = 1, modules.game_interface.getRightPanelsCount() do
+    local p = modules.game_interface.getRightPanel(i)
+    if p then
+      if not p:isVisible() then p:setVisible(true) end
+      if p:getWidth() ~= PANEL_WIDTH then p:setWidth(PANEL_WIDTH) end
+    end
+  end
+  for i = 1, modules.game_interface.getLeftPanelsCount() do
+    local p = modules.game_interface.getLeftPanelByIndex(i)
+    if p then
+      if not p:isVisible() then p:setVisible(true) end
+      if p:getWidth() ~= PANEL_WIDTH then p:setWidth(PANEL_WIDTH) end
+    end
+  end
+
+  local targetParent = rightPanel
+
+  if mode == 2 then
+    local innerPanel = modules.game_interface.getLeftPanelByIndex(1)
+    if innerPanel then
+      targetParent = innerPanel
+      if modules.game_interface.getLeftPanelsCount() >= 2 then
+        local outerPanel = modules.game_interface.getLeftPanelByIndex(2)
+        outerPanel:setVisible(false)
+        innerPanel:setWidth(PANEL_WIDTH * 2 - 1)
+      end
+    end
+  elseif mode == 3 then
+    if modules.game_interface.getRightPanelsCount() >= 2 then
+      local innerPanel = modules.game_interface.getRightPanel(2)
+      local outerPanel = modules.game_interface.getRightPanel(1)
+      outerPanel:setVisible(false)
+      innerPanel:setWidth(PANEL_WIDTH * 2 - 1)
+      targetParent = innerPanel
+    end
   end
 
   if minimapWindow:getParent() ~= targetParent then
     minimapWindow:setParent(targetParent)
-  end
-
-  minimapWindow:setWidth(targetWidth)
-
-  if targetPos then
-    minimapWindow:setPosition(targetPos)
   end
 end
 
