@@ -25,10 +25,9 @@ local defaultOptions = {
   enableAudio = true,
   enableMusicSound = false,
   musicSoundVolume = 100,
-  botSoundVolume = 100,
   enableLights = false,
-  floorFading = 500,
-  crosshair = 2,
+  floorFading = 0,
+  crosshair = 1,
   ambientLight = 100,
   optimizationLevel = 1,
   displayNames = true,
@@ -37,8 +36,8 @@ local defaultOptions = {
   displayHealthOnTop = false,
   showHealthManaCircle = false,
   hidePlayerBars = false,
-  highlightThingsUnderCursor = true,
-  topHealtManaBar = true,
+  highlightThingsUnderCursor = false,
+  topHealtManaBar = false,
   displayText = true,
   dontStretchShrink = false,
   turnDelay = 30,
@@ -51,12 +50,12 @@ local defaultOptions = {
   walkTeleportDelay = 200,
   walkCtrlTurnDelay = 150,
 
-  topBar = true,
+  topBar = false,
 
   profile = 1,
 
   antialiasing = true,
-  floorShadow = true,
+  floorShadow = false,
 
   autoSwitchPreset = true
 }
@@ -367,6 +366,12 @@ function setup()
     end
   end
 
+  -- Force these options off regardless of saved settings (removed from UI)
+  setOption('topBar', false)
+  setOption('topHealtManaBar', false)
+  setOption('showHealthManaCircle', false)
+  setOption('floorShadow', false)
+
   assignSpellWindow.availableSpellsOnly:setChecked(false)
 
   if g_game.isOnline() then
@@ -518,10 +523,6 @@ function updateValues(key, value)
     if g_sounds ~= nil then
       g_sounds.getChannel(SoundChannels.Music):setGain(value / 100)
     end
-  elseif key == "botSoundVolume" then
-    if g_sounds ~= nil then
-      g_sounds.getChannel(SoundChannels.Bot):setGain(value / 100)
-    end
   elseif key == "showHealthManaCircle" then
     modules.game_healthinfo.healthCircle:setVisible(value)
     modules.game_healthinfo.healthCircleFront:setVisible(value)
@@ -541,7 +542,6 @@ function updateValues(key, value)
     graphicsPanel:getChildById("ambientLightLabel"):setVisible(value)
   elseif key == "floorFading" then
     gameMapPanel:setFloorFading(value)
-    gameWindowPanel:getChildById("floorFadingLabel"):setText(tr("Floor fading: %s ms", value))
   elseif key == "crosshair" then
     if value == 1 then
       gameMapPanel:setCrosshair("")
@@ -878,9 +878,6 @@ function setLightOptionsVisibility(value)
   graphicsPanel:getChildById("enableLights"):setEnabled(value)
   graphicsPanel:getChildById("ambientLightLabel"):setEnabled(value)
   graphicsPanel:getChildById("ambientLight"):setEnabled(value)
-  gameWindowPanel:getChildById("floorFading"):setEnabled(value)
-  gameWindowPanel:getChildById("floorFadingLabel"):setEnabled(value)
-  gameWindowPanel:getChildById("floorFadingLabel2"):setEnabled(value)
 end
 
 -- controls and keybinds

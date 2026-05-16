@@ -18,7 +18,6 @@ Makefile
 *.gz
 *.7z
 !tests.7z
-!android_libs.7z
 *.spr
 *.dat
 *.kdev*
@@ -134,3 +133,10 @@ _ReSharper*/
 
 # JetBrain tools
 /.idea
+
+# Claude Code workspace files
+.claude/
+
+# Local build output logs
+build_output.txt
+build_release_output.txt

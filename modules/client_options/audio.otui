@@ -18,15 +18,3 @@ OptionPanel
     id: musicSoundVolume
     minimum: 0
     maximum: 100
-
-  Label
-    id: botSoundVolumeLabel
-    !text: tr('Bot sound volume: %d', 100)
-    @onSetup: |
-      local value = modules.client_options.getOption('botSoundVolume')
-      self:setText(tr('Bot sound volume: %d', value))
-
-  OptionScrollbar
-    id: botSoundVolume
-    minimum: 0
-    maximum: 100

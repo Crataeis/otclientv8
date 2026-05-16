@@ -7,7 +7,6 @@ Module
   scripts: [ widgets/uigamemap, gameinterface ]
   load-later:
     - game_buttons
-    - game_questlog
     - game_textmessage
     - game_console
     - game_outfit
@@ -35,11 +34,9 @@ Module
     - game_itemselector
     - client_textedit
     - client_profiles
-    - game_actionbar
     - game_prey
     - game_imbuing
     - game_stats
     - game_shaders
-    - game_bot
   @onLoad: init()
   @onUnload: terminate()

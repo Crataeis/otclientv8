@@ -65,13 +65,8 @@ public:
 
     std::string resolvePath(std::string path);
     std::string getWorkDir() { return "/"; }
-#ifdef ANDROID
-    std::string getWriteDir() { return "/"; }
-    std::string getBinaryName() { return "otclientv8.apk"; }
-#else
     std::string getWriteDir() { return m_writeDir.string(); }
     std::string getBinaryName() { return m_binaryPath.filename().string(); }
-#endif
 
     std::string guessFilePath(const std::string& filename, const std::string& type);
     bool isFileType(const std::string& filename, const std::string& type);
@@ -112,9 +107,7 @@ private:
     bool mountMemoryData(const std::shared_ptr<std::vector<uint8_t>>& data);
     void unmountMemoryData();
 
-#ifndef ANDROID
     std::filesystem::path m_binaryPath, m_writeDir;
-#endif
     bool m_loadedFromMemory = false;
     bool m_loadedFromArchive = false;
     std::shared_ptr<std::vector<uint8_t>> m_memoryData;

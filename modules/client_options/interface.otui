@@ -97,23 +97,25 @@ OptionPanel
 
   Panel
     height: 40
-    margin-top: 3
+    margin-top: 5
 
     $mobile:
       visible: false
 
     Label
       id: wideminimapLabel
+      width: 90
+      height: 16
       anchors.left: parent.left
       anchors.top: parent.top
       !text: tr('Wide minimap')
 
     ComboBox
       id: wideMinimap
+      width: 165
       anchors.left: parent.left
       anchors.top: wideminimapLabel.bottom
       margin-top: 3
-      margin-right: 2
       @onOptionChange: modules.client_options.presetOption(self, self:getId(), self.currentIndex)
       @onSetup: |
         self:addOption("Disabled")

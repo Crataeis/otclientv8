@@ -41,28 +41,6 @@ cp otclient ../otclient && cd ..
 ```
 
 
-### Android
-
-To compile on android you need to create `C:\android` with
-
-- Android SDK 25
-- Android NDK r21d
-- Apache Ant 1.9
-- Content of android_libs.7z (`C:\android\lib`, `C:\android\lib64`, `C:\android\include`)
-
-SDK, NDK and Ant can be downloaded [here](https://drive.google.com/drive/folders/1jLnqB4zYqz3j3s9g3TraZdJQDOdlW7aM?usp=sharing)
-
-Also install `Mobile development with C++` using Visual Studio Installer
-
-Then open `android/otclientv8.sln`, open Tools -> Options -> Cross Platform -> C++ -> Android and:
-
-- Set Android SDK to `C:\android\25`
-- Set Android NDK to `C:\android\android-ndk-r21d`
-- Set Apache Ant to `C:\android\apache-ant-1.9.16`
-- Put data.zip in `android/otclientv8/assets`
-- Select Release and ARM64
-- Build `otclientv8` (the one with phone icon, not folder)
-
 ## Useful tips
 
 - To run tests manually, unpack tests.7z and use command `otclient_debug.exe --test`

@@ -22,6 +22,7 @@ function updateFeatures(version)
         g_game.enableFeature(GameLooktypeU16)
         g_game.enableFeature(GameMessageStatements)
         g_game.enableFeature(GameLoginPacketEncryption)
+        
     end
 
     if(version >= 780) then

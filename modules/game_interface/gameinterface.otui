@@ -42,12 +42,12 @@ GameAction < UIButton
 UIWidget
   id: gameRootPanel
   anchors.fill: parent
-  
+
   GameMapPanel
     id: gameMapPanel
     anchors.left: gameLeftPanels.right
     anchors.right: gameRightPanels.left
-    anchors.top: parent.top
+    anchors.top: gameButtonsBar.bottom
     anchors.bottom: gameBottomPanel.top
     focusable: false    
     
@@ -85,7 +85,7 @@ UIWidget
   Panel
     id: gameLeftPanels
     focusable: false
-    anchors.top: parent.top
+    anchors.top: gameButtonsBar.bottom
     anchors.bottom: parent.bottom    
     $!mobile:
       anchors.left: parent.left
@@ -116,7 +116,7 @@ UIWidget
   Panel
     id: gameRightPanels
     anchors.right: parent.right
-    anchors.top: parent.top
+    anchors.top: gameButtonsBar.bottom
     anchors.bottom: parent.bottom
     focusable: false
     layout:
@@ -195,7 +195,7 @@ UIWidget
   Panel
     id: gameTopBar
     image-source: /images/ui/panel_bottom2
-    anchors.top: parent.top
+    anchors.top: gameButtonsBar.bottom
     anchors.left: gameBottomActionPanel.left
     anchors.right: gameBottomActionPanel.right
     focusable: false
@@ -206,3 +206,20 @@ UIWidget
     layout:
       type: verticalBox
       fit-children: true
+
+  Panel
+    id: gameButtonsBar
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 30
+    focusable: false
+    image-source: /images/ui/panel_bottom2
+    image-border: 4
+    padding: 2
+    $mobile:
+      height: 0
+      visible: false
+    layout:
+      type: horizontalBox
+      spacing: 2

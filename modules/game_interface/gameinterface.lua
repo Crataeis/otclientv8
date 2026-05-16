@@ -8,6 +8,7 @@ gameLeftActionPanel = nil
 gameRightActionPanel = nil
 gameLeftActions = nil
 gameTopBar = nil
+gameButtonsBar = nil
 logoutButton = nil
 mouseGrabberWidget = nil
 countWindow = nil
@@ -56,6 +57,7 @@ function init()
   gameRightActionPanel = gameRootPanel:getChildById('gameRightActionPanel')
   gameLeftActionPanel = gameRootPanel:getChildById('gameLeftActionPanel')  
   gameTopBar = gameRootPanel:getChildById('gameTopBar')
+  gameButtonsBar = gameRootPanel:getChildById('gameButtonsBar')
   gameLeftActions = gameRootPanel:getChildById('gameLeftActions')
   connect(gameLeftPanel, { onVisibilityChange = onLeftPanelVisibilityChange })
 
@@ -961,6 +963,10 @@ function getTopBar()
   return gameTopBar
 end
 
+function getButtonsBar()
+  return gameButtonsBar
+end
+
 function refreshViewMode()  
   local classic = g_settings.getBoolean("classicView") and not g_app.isMobile()
   local rightPanels = g_settings.getNumber("rightPanels") - gameRightPanels:getChildCount()
@@ -1041,7 +1047,10 @@ function refreshViewMode()
     end
   else
     g_game.changeMapAwareRange(31, 21)
-    gameMapPanel:fill('parent')
+    gameMapPanel:addAnchor(AnchorTop, 'gameButtonsBar', AnchorBottom)
+    gameMapPanel:addAnchor(AnchorBottom, 'parent', AnchorBottom)
+    gameMapPanel:addAnchor(AnchorLeft, 'parent', AnchorLeft)
+    gameMapPanel:addAnchor(AnchorRight, 'parent', AnchorRight)
     gameMapPanel:setKeepAspectRatio(false)
     gameMapPanel:setLimitVisibleRange(false)
     gameMapPanel:setOn(true)
@@ -1135,13 +1144,6 @@ function updateSize()
       gameMapPanel:setMarginRight(rightInset + margin)
     end
       
-    if modules.game_bot then
-      for i, child in ipairs(gameMapPanel:getChildren()) do
-        if child.botIcon and child.onGeometryChange then
-          child.onGeometryChange(child)
-        end
-      end
-    end
   else
     if modules.game_stats then
       modules.game_stats.ui:setMarginTop(0)

@@ -33,9 +33,7 @@
 #include <framework/platform/platform.h>
 #include <framework/http/http.h>
 
-#if !defined(ANDROID)
 #include <boost/process.hpp>
-#endif
 
 #include <locale>
 
@@ -63,9 +61,6 @@ Application::Application()
     m_appVersion = "none";
     m_charset = "cp1252";
     m_stopping = false;
-#ifdef ANDROID
-    m_mobile = true;
-#endif
 }
 
 void Application::init(std::vector<std::string>& args)
@@ -186,7 +181,6 @@ void Application::close()
 
 void Application::restart()
 {
-#if !defined(ANDROID)
     boost::process::child c(g_resources.getBinaryName());
     std::error_code ec2;
     if (c.wait_for(std::chrono::seconds(1), ec2)) {
@@ -194,14 +188,10 @@ void Application::restart()
     }
     c.detach();
     quick_exit();
-#else
-    exit();
-#endif
 }
 
 void Application::restartArgs(const std::vector<std::string>& args)
 {
-#if !defined(ANDROID)
     boost::process::child c(g_resources.getBinaryName(), boost::process::args(args));
     std::error_code ec2;
     if (c.wait_for(std::chrono::seconds(1), ec2)) {
@@ -209,16 +199,11 @@ void Application::restartArgs(const std::vector<std::string>& args)
     }
     c.detach();
     quick_exit();
-#else
-    exit();
-#endif
 }
 
 std::string Application::getOs()
 {
-#if defined(ANDROID)
-    return "android";
-#elif defined(WIN32)
+#if defined(WIN32)
     return "windows";
 #elif defined(__APPLE__)
     return "mac";
@@ -228,4 +213,3 @@ std::string Application::getOs()
     return "unknown";
 #endif
 }
-

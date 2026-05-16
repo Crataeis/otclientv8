@@ -17,7 +17,3 @@ OptionPanel
       self:addOption("8")
       self:addOption("9")
       self:addOption("10")
-
-  OptionCheckBox
-    id: actionbarLock
-    !text: tr('Disable action bar hotkeys when chat mode is on')
